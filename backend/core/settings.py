@@ -14,7 +14,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders', # Habilitacion de cors
+
+    'corsheaders',
+
+    'rest_framework',
+    'django_filters',
+    'drf_spectacular',
+
+    'findings',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +63,12 @@ DATABASES = {
         'PASSWORD': 'Admin123*',
         'HOST': 'db',
         'PORT': '3306',
+
+        # Base usada por Django al correr pruebas automáticas.
+        # Se separa de proyectoDB para no tocar los datos reales de desarrollo.
+        'TEST': {
+            'NAME': 'test_proyectoDB',
+        },
     }
 }
 
@@ -67,3 +80,32 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 STATIC_URL = 'static/'
+
+LANGUAGE_CODE = 'es-mx'
+TIME_ZONE = 'America/Mexico_City'
+USE_I18N = True
+USE_TZ = True
+
+REST_FRAMEWORK = {
+    # Genera el esquema OpenAPI usado por Swagger.
+    # Esto permite documentar la API para frontend y para pruebas de integración.
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Registro Digno API',
+    'DESCRIPTION': (
+        'API backend para registro, visualización y búsqueda de hallazgos. '
+        'El MVP prioriza registros de hallazgos, filtros básicos, ficha completa '
+        'y catálogos para formularios de React.'
+    ),
+    'VERSION': '0.1.0',
+}
