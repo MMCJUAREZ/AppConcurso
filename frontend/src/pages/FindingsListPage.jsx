@@ -104,9 +104,6 @@ export default function FindingsListPage() {
         <div style={s.navSection}>
           <NavItem icon="ti-list" label="Hallazgos" active onClick={() => navigate('/')} />
           <NavItem icon="ti-search" label="Búsqueda avanzada" onClick={() => navigate('/busqueda')} />
-          {(user?.role === 'admin' || user?.role === 'validator') && (
-            <NavItem icon="ti-users" label="Usuarias" onClick={() => navigate('/usuarias')} />
-          )}
         </div>
 
         <div style={{ marginTop: 'auto' }}>
