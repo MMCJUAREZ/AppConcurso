@@ -21,6 +21,7 @@ class FindingRecordAdmin(admin.ModelAdmin):
         "finding_date",
         "created_at",
     ]
+
     list_filter = [
         "status",
         "finding_type",
@@ -28,15 +29,28 @@ class FindingRecordAdmin(admin.ModelAdmin):
         "state",
         "estimated_sex",
     ]
+
     search_fields = [
         "record_code",
         "state",
         "municipality",
         "locality",
+        "source",
+        "internal_notes",
+        "location_notes",
         "tattoos",
         "scars",
+        "moles",
+        "piercings",
+        "prosthetics",
+        "amputations",
+        "institutional_folio",
+        "case_reference",
+        "semefo",
         "institutional_notes",
+        "contact_email",
     ]
+
     readonly_fields = [
         "record_code",
         "created_at",
