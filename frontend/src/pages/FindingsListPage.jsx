@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import api from '../api/client'
+import findingService from '../services/findingService'
+import LogoutButton from '../components/LogoutButton'
 
 // Valores especiales permitidos según la documentación
 const ESTADO_LABELS = {
@@ -50,7 +51,7 @@ function Badge({ estado }) {
 }
 
 export default function FindingsListPage() {
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
 
   const [findings, setFindings] = useState([])
@@ -64,12 +65,35 @@ export default function FindingsListPage() {
   const fetchFindings = useCallback(async () => {
     setLoading(true)
     setError('')
+
     try {
       const params = {}
-      if (filterEstado !== 'all') params.record_status = filterEstado
-      if (search) params.search = search
-      const { data } = await api.get('/findings/', { params })
-      setFindings(data.results || [])
+
+      // Filtro rápido por estado.
+      // Backend espera record_status porque así lo dejamos compatible con el frontend.
+      if (filterEstado !== 'all') {
+        params.record_status = filterEstado
+      }
+
+      // Búsqueda textual general.
+      if (search.trim()) {
+        params.search = search.trim()
+      }
+
+      const data = await findingService.getAll(params)
+
+      let results = data.results || data || []
+
+      // Respaldo en frontend.
+      // Si por alguna razón backend devuelve todos los registros, aquí se vuelve a filtrar.
+      if (filterEstado !== 'all') {
+        results = results.filter((item) => {
+          const estado = item.status || item.record_status
+          return estado === filterEstado
+        })
+      }
+
+      setFindings(results)
     } catch (err) {
       setError('No se pudo cargar la lista de hallazgos.')
     } finally {
@@ -85,8 +109,10 @@ export default function FindingsListPage() {
     { value: 'all', label: 'Todos' },
     { value: 'active', label: 'Activos' },
     { value: 'draft', label: 'Borradores' },
-    { value: 'restricted', label: 'Restringidos' },
     { value: 'in_review', label: 'En revisión' },
+    { value: 'restricted', label: 'Restringidos' },
+    { value: 'closed', label: 'Cerrados' },
+    { value: 'archived', label: 'Archivados' },
   ]
 
   return (
@@ -102,11 +128,32 @@ export default function FindingsListPage() {
         </div>
 
         <div style={s.navSection}>
-          <NavItem icon="ti-list" label="Hallazgos" active onClick={() => navigate('/')} />
-          <NavItem icon="ti-search" label="Búsqueda avanzada" onClick={() => navigate('/busqueda')} />
-          {(user?.role === 'admin' || user?.role === 'validator') && (
-            <NavItem icon="ti-users" label="Usuarias" onClick={() => navigate('/usuarias')} />
+          <NavItem
+            icon="ti-list"
+            label="Hallazgos"
+            active
+            onClick={() => navigate('/')}
+          />
+
+          <NavItem
+            icon="ti-plus"
+            label="Nuevo registro"
+            onClick={() => navigate('/nuevo')}
+          />
+
+          {user?.canInvite && (
+            <NavItem
+              icon="ti-mail-plus"
+              label="Invitaciones"
+              onClick={() => navigate('/invitaciones')}
+            />
           )}
+
+          {/*
+            Búsqueda avanzada y gestión de usuarias quedan pendientes.
+            Se ocultan en la versión de presentación porque todavía no existen
+            pantallas funcionales para /busqueda ni /usuarias.
+          */}
         </div>
 
         <div style={{ marginTop: 'auto' }}>
@@ -117,7 +164,7 @@ export default function FindingsListPage() {
               <div style={s.userRole}>{user?.role || 'registrada'}</div>
             </div>
           </div>
-          <button onClick={logout} style={s.logoutBtn}>Cerrar sesión</button>
+          <LogoutButton />
         </div>
       </nav>
 

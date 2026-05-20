@@ -78,26 +78,35 @@ class FindingRecord(models.Model):
     )
 
     # Datos internos del registro.
+    # El modelo conserva "status" como nombre canónico.
+    # El serializer acepta "record_status" porque ese nombre ya lo usa React.
     status = models.CharField(
         max_length=20,
         choices=RecordStatus.choices,
         default=RecordStatus.DRAFT,
     )
+
     finding_type = models.CharField(
         max_length=30,
         choices=FindingType.choices,
         default=FindingType.UNKNOWN,
     )
+
     source = models.CharField(
         max_length=150,
         blank=True,
         help_text="Fuente general del dato: observación directa, documento, autoridad, testimonio u otra.",
     )
+
     confidence_level = models.CharField(
         max_length=30,
         choices=ConfidenceLevel.choices,
         default=ConfidenceLevel.UNCONFIRMED,
     )
+
+    # Campo agregado para alinear backend con el formulario actual de React.
+    # Permite guardar notas internas del registro sin mezclarlas con notas institucionales.
+    internal_notes = models.TextField(blank=True)
 
     # Ubicación general visible para búsqueda y visualización.
     country = models.CharField(max_length=100, default="México")
@@ -111,6 +120,9 @@ class FindingRecord(models.Model):
     # Se separan desde el modelo para que después puedan ocultarse por permisos.
     exact_location_restricted = models.TextField(blank=True)
     coordinates_restricted = models.CharField(max_length=100, blank=True)
+
+    # El modelo conserva "location_notes" como nombre canónico.
+    # El serializer acepta "place_notes" porque ese nombre ya lo usa React.
     location_notes = models.TextField(blank=True)
 
     # Fecha y tiempo.
@@ -118,9 +130,17 @@ class FindingRecord(models.Model):
     approximate_time = models.TimeField(null=True, blank=True)
     date_notes = models.TextField(blank=True)
 
+    # Campo agregado para registrar rangos temporales o expresiones aproximadas.
+    # Ejemplo: "entre la noche del viernes y la madrugada del sábado".
+    temporal_range = models.CharField(max_length=150, blank=True)
+
     # Condición general del hallazgo.
     estimated_individuals = models.CharField(max_length=100, blank=True)
+
+    # El modelo conserva "conservation_status" como nombre canónico.
+    # El serializer acepta "conservation_state" porque ese nombre ya lo usa React.
     conservation_status = models.CharField(max_length=100, blank=True)
+
     integrity = models.CharField(max_length=100, blank=True)
     exposure = models.CharField(max_length=100, blank=True)
     general_condition_notes = models.TextField(blank=True)
@@ -131,6 +151,7 @@ class FindingRecord(models.Model):
         choices=EstimatedSex.choices,
         default=EstimatedSex.UNKNOWN,
     )
+
     estimated_age = models.CharField(max_length=100, blank=True)
     estimated_height = models.CharField(max_length=100, blank=True)
     estimated_weight = models.CharField(max_length=100, blank=True)
@@ -148,11 +169,29 @@ class FindingRecord(models.Model):
     piercings = models.TextField(blank=True)
     prosthetics = models.TextField(blank=True)
     surgical_marks = models.TextField(blank=True)
+
+    # Campo agregado porque el formulario React ya lo contempla.
+    # Se separa de prosthetics porque una amputación no es lo mismo que una prótesis.
+    amputations = models.TextField(blank=True)
+
     distinctive_marks_notes = models.TextField(blank=True)
 
     # Bloques que se dejan desde ahora para no rediseñar la API después.
+    # Campos dentales agregados porque el formulario React ya los separa.
+    braces = models.TextField(blank=True)
+    dental_prosthetics = models.TextField(blank=True)
+    missing_teeth = models.TextField(blank=True)
+    dental_restorations = models.TextField(blank=True)
     dental_notes = models.TextField(blank=True)
+
     medical_notes = models.TextField(blank=True)
+
+    # Información institucional.
+    # Estos campos se agregan para que el backend reciba lo que ya captura React.
+    notified_authority = models.CharField(max_length=150, blank=True)
+    institutional_folio = models.CharField(max_length=150, blank=True)
+    case_reference = models.CharField(max_length=150, blank=True)
+    semefo = models.CharField(max_length=150, blank=True)
     institutional_notes = models.TextField(blank=True)
 
     # Correo de contacto para que React pueda construir un mailto.

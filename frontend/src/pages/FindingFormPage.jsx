@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/client'
+import LogoutButton from '../components/LogoutButton'
 
 // Catálogos del backend
 const RECORD_STATUS = [
@@ -8,6 +9,8 @@ const RECORD_STATUS = [
   { value: 'active', label: 'Activo' },
   { value: 'in_review', label: 'En revisión' },
   { value: 'restricted', label: 'Restringido' },
+  { value: 'closed', label: 'Cerrado' },
+  { value: 'archived', label: 'Archivado' },
 ]
 
 const FINDING_TYPE = [
@@ -227,6 +230,13 @@ export default function FindingFormPage() {
           <i className="ti ti-arrow-left" style={{ fontSize: '14px' }} aria-hidden="true" />
           Volver a lista
         </button>
+        <button type="button" onClick={() => navigate('/invitaciones')} style={s.backBtn}>
+          <i className="ti ti-mail-plus" style={{ fontSize: '14px' }} aria-hidden="true" />
+          Invitaciones
+        </button>
+
+        <LogoutButton />
+
         <div style={s.sidebarInfo}>
           <p style={s.sidebarInfoText}>
             Los campos marcados con <span style={{ color: '#b84040' }}>*</span> son requeridos.

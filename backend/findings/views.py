@@ -39,9 +39,11 @@ class FindingRecordViewSet(viewsets.ModelViewSet):
         filters.SearchFilter,
         filters.OrderingFilter,
     ]
+
     filterset_class = FindingRecordFilter
 
-    # Búsqueda textual general. React puede usarla con:
+    # Búsqueda textual general.
+    # React puede usarla con:
     # /api/findings/?search=tatuaje
     search_fields = [
         "record_code",
@@ -49,23 +51,44 @@ class FindingRecordViewSet(viewsets.ModelViewSet):
         "municipality",
         "locality",
         "region",
+        "source",
+        "internal_notes",
+        "location_notes",
+        "temporal_range",
         "tattoos",
         "scars",
         "moles",
+        "piercings",
         "prosthetics",
+        "amputations",
         "surgical_marks",
+        "braces",
+        "dental_prosthetics",
+        "missing_teeth",
+        "dental_restorations",
+        "dental_notes",
+        "medical_notes",
+        "notified_authority",
+        "institutional_folio",
+        "case_reference",
+        "semefo",
         "institutional_notes",
+        "contact_email",
     ]
 
     # Campos permitidos para ordenamiento desde frontend.
-    # Ejemplo: /api/findings/?ordering=finding_date
+    # Ejemplo:
+    # /api/findings/?ordering=finding_date
     ordering_fields = [
         "created_at",
         "updated_at",
         "finding_date",
         "state",
         "municipality",
+        "status",
+        "finding_type",
     ]
+
     ordering = ["-created_at"]
 
     def get_serializer_class(self):
@@ -129,4 +152,4 @@ class FindingRecordViewSet(viewsets.ModelViewSet):
                     for value, label in FindingRecord.EstimatedSex.choices
                 ],
             }
-        )            
+        )
